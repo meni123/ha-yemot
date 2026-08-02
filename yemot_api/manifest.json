@@ -1,0 +1,9 @@
+{
+  "domain": "yemot_api",
+  "name": "Yemot HaMashiach API",
+  "codeowners": ["@yourname"],
+  "dependencies": [],
+  "requirements": [],
+  "config_flow": true,
+  "version": "1.0.0"
+}
