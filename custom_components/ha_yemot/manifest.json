@@ -1,7 +1,7 @@
 {
   "domain": "ha-yemot",
   "name": "Yemot HaMashiach API",
-  "codeowners": ["@yourname"],
+  "codeowners": ["@meni123"],
   "dependencies": [],
   "requirements": [],
   "config_flow": true,
