@@ -7,7 +7,15 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.util import dt as dt_util
 
-DOMAIN = "ha-yemot"
+# ייבוא הקבועים מקובץ const.py
+from .const import (
+    DOMAIN,
+    UPDATE_EXTENSION_URL,
+    UPLOAD_TEXT_FILE_URL,
+    RUN_TZINTUK_URL,
+    SEND_TTS_URL
+)
+
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -24,6 +32,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # --- 1. השירות ליצירת שלוחות בימות המשיח ---
     async def handle_create_extension(call):
+        """יצירת שלוחה בימות המשיח והגדרתה כ-API."""
         folder = call.data.get("folder")
         entity_id = call.data.get("entity_id")
         action = call.data.get("action", "")
@@ -33,21 +42,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         
         ext_content = f"type=api\napi_link={api_link}\napi_url_post=yes"
         
-        async with aiohttp.ClientSession() as session:
-            await session.post(
-                "https://www.call2all.co.il/ym/api/UpdateExtension", 
-                data={"token": yemot_manager_token, "path": f"ivr2:{folder}"}
-            )
-            
-            await asyncio.sleep(0.5)
-            
-            await session.post(
-                "https://www.call2all.co.il/ym/api/UploadTextFile", 
-                data={"token": yemot_manager_token, "path": f"ivr2:{folder}/ext.ini", "contents": ext_content}
-            )
+        try:
+            async with aiohttp.ClientSession() as session:
+                # שלב א': יצירת התיקייה
+                await session.post(
+                    UPDATE_EXTENSION_URL, 
+                    data={"token": yemot_manager_token, "path": f"ivr2:{folder}"}
+                )
+                
+                await asyncio.sleep(0.5)
+                
+                # שלב ב': הזרקת קובץ ההגדרות לתוך התיקייה
+                await session.post(
+                    UPLOAD_TEXT_FILE_URL, 
+                    data={"token": yemot_manager_token, "path": f"ivr2:{folder}/ext.ini", "contents": ext_content}
+                )
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"שגיאת תקשורת מול ימות המשיח בעת יצירת שלוחה: {err}")
 
     # --- 2. שירות לשליחת צנתוקים ---
     async def handle_send_tzintuk(call):
+        """שליחת צנתוק למספרים נבחרים."""
         phones = call.data.get("phones")
         caller_id = call.data.get("caller_id")
         
@@ -55,11 +70,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if caller_id:
             payload["callerId"] = caller_id
             
-        async with aiohttp.ClientSession() as session:
-            await session.post("https://www.call2all.co.il/ym/api/RunTzintuk", data=payload)
+        try:
+            async with aiohttp.ClientSession() as session:
+                await session.post(RUN_TZINTUK_URL, data=payload)
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"שגיאת תקשורת בעת שליחת צנתוק: {err}")
 
     # --- 3. שירות להוצאת שיחה קולית (TTS) ---
     async def handle_send_tts(call):
+        """שליחת הודעת טקסט לדיבור (TTS) למספרים נבחרים."""
         phones = call.data.get("phones")
         message = call.data.get("message")
         caller_id = call.data.get("caller_id")
@@ -72,8 +91,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if caller_id:
             payload["callerId"] = caller_id
             
-        async with aiohttp.ClientSession() as session:
-            await session.post("https://www.call2all.co.il/ym/api/SendTTS", data=payload)
+        try:
+            async with aiohttp.ClientSession() as session:
+                await session.post(SEND_TTS_URL, data=payload)
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"שגיאת תקשורת בעת שליחת שיחת TTS: {err}")
 
     hass.services.async_register(DOMAIN, "create_extension", handle_create_extension)
     hass.services.async_register(DOMAIN, "send_tzintuk", handle_send_tzintuk)
@@ -82,6 +104,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """הסרת התוסף מ-Home Assistant מתוך הממשק."""
     hass.services.async_remove(DOMAIN, "create_extension")
     hass.services.async_remove(DOMAIN, "send_tzintuk")
     hass.services.async_remove(DOMAIN, "send_tts")
@@ -89,25 +112,31 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 class YemotApiView(HomeAssistantView):
+    """תצוגת ה-API לקבלת בקשות נכנסות משרתי ימות המשיח."""
+    
     url = "/api/yemot/{token}/{entity_id}"
     extra_urls = ["/api/yemot/{token}/{entity_id}/{action}"]
     name = "api:yemot"
     requires_auth = False 
 
     def __init__(self, hass: HomeAssistant, api_token: str, allowed_ips: list):
+        """אתחול מחלקת התצוגה."""
         self.hass = hass
         self.api_token = api_token
         self.allowed_ips = allowed_ips
 
     async def get(self, request: web.Request, token: str, entity_id: str, action: str = None) -> web.Response:
+        """טיפול בבקשות GET נכנסות."""
         await request.read()
         return await self._process_request(request, token, entity_id, action)
 
     async def post(self, request: web.Request, token: str, entity_id: str, action: str = None) -> web.Response:
+        """טיפול בבקשות POST נכנסות."""
         await request.read()
         return await self._process_request(request, token, entity_id, action)
 
     async def _process_request(self, request: web.Request, token: str, entity_id: str, action: str) -> web.Response:
+        """עיבוד הבקשה, הפעלת פעולות (אם נדרש) והחזרת סטטוס המכשיר."""
         client_ip_header = request.headers.get("X-Forwarded-For", request.remote)
         client_ip = client_ip_header.split(',')[0].strip() if client_ip_header else ""
         
@@ -130,7 +159,8 @@ class YemotApiView(HomeAssistantView):
                     return self._build_response(f"הפעולה בוצעה והמכשיר כרגע {ans}")
                 else:
                     return self._build_response("הפעולה נשלחה אך לא ניתן לוודא את הסטטוס החדש")
-            except Exception:
+            except Exception as err:
+                _LOGGER.error(f"שגיאה בהפעלת שירות {action} על ישות {entity_id}: {err}")
                 return self._build_response("שגיאה בביצוע הפעולה")
 
         state = self.hass.states.get(entity_id)
@@ -141,6 +171,7 @@ class YemotApiView(HomeAssistantView):
         return self._build_response(f"הסטטוס כרגע {ans}")
 
     def _translate_state(self, domain: str, state_obj) -> str:
+        """תרגום מצב הישות לאנגלית/מספרים לטקסט מדובר בעברית."""
         raw_st = str(state_obj.state) 
         st = raw_st.lower()
         
@@ -200,6 +231,7 @@ class YemotApiView(HomeAssistantView):
         return translations.get(st, "במצב לא מוכר")
 
     def _build_response(self, text: str) -> web.Response:
+        """בניית תגובת שרת בפורמט התואם לדרישות ימות המשיח."""
         safe_text = text.replace("-", " ").replace("&", " ו-").replace("=", " שווה ")
-        response_text = f"id_list_message=t-{safe_text}&go_to_folder=hangup&"
+        response_text = f"id_list_message=t-{safe_text}&go_to_folder=/&"
         return web.Response(text=response_text, content_type="text/plain", charset="utf-8")
