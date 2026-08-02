@@ -1,4 +1,4 @@
-Home Assistant Yemot Integration (ha-yemot)
+Home Assistant Yemot Integration (ha-yemot)        
 
 
 אינטגרציה ל-Home Assistant המחברת בין מערכת הטלפוניה וה-IVR של ימות המשיח לבין הבית החכם.
