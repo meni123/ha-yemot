@@ -1,6 +1,7 @@
 import logging
 import asyncio
 import aiohttp
+import ipaddress
 from aiohttp import web
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -138,10 +139,34 @@ class YemotApiView(HomeAssistantView):
     async def _process_request(self, request: web.Request, token: str, entity_id: str, action: str) -> web.Response:
         """עיבוד הבקשה, הפעלת פעולות (אם נדרש) והחזרת סטטוס המכשיר."""
         client_ip_header = request.headers.get("X-Forwarded-For", request.remote)
-        client_ip = client_ip_header.split(',')[0].strip() if client_ip_header else ""
+        client_ip_str = client_ip_header.split(',')[0].strip() if client_ip_header else ""
         
-        if self.allowed_ips and client_ip not in self.allowed_ips:
-            return web.Response(text="Access Denied", status=403, content_type="text/plain")
+        # --- בדיקת אבטחה משופרת: תומכת בכתובות IP ובטווחים (CIDR) ---
+        if self.allowed_ips:
+            is_allowed = False
+            try:
+                # המרת ה-IP של השולח לאובייקט
+                client_ip_obj = ipaddress.ip_address(client_ip_str)
+                
+                for network_str in self.allowed_ips:
+                    if not network_str:
+                        continue
+                    try:
+                        # המרת הערך מההגדרות לרשת
+                        network = ipaddress.ip_network(network_str, strict=False)
+                        
+                        # אם הכתובת של השולח נמצאת בטווח המורשה
+                        if client_ip_obj in network:
+                            is_allowed = True
+                            break
+                    except ValueError:
+                        pass # דילוג במקרה של טקסט לא חוקי בהגדרות
+            except ValueError:
+                pass # ה-IP של השולח אינו תקני
+
+            if not is_allowed:
+                return web.Response(text="Access Denied", status=403, content_type="text/plain")
+        # -------------------------------------------------------------
 
         if token != self.api_token:
             return self._build_response("שגיאת הרשאה")
