@@ -7,7 +7,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.util import dt as dt_util
 
-DOMAIN = "yemot_api"
+DOMAIN = "ha-yemot"
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
