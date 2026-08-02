@@ -1,5 +1,5 @@
 {
-  "domain": "ha-yemot",
+  "domain": "ha_yemot",
   "name": "Yemot HaMashiach API",
   "codeowners": ["@meni123"],
   "dependencies": [],
