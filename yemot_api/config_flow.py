@@ -2,7 +2,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 
-DOMAIN = "yemot_api"
+DOMAIN = "ha-yemot"
 
 class YemotConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
