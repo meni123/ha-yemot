@@ -1,6 +1,6 @@
 """Constants for the Yemot API integration."""
 
-DOMAIN = ""ha_yemot
+DOMAIN = "ha_yemot"
 
 # Yemot HaMashiach API URLs
 YEMOT_API_BASE_URL = "https://www.call2all.co.il/ym/api"
