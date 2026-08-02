@@ -1,0 +1,88 @@
+create_extension:
+  name: "ימות המשיח: הגדרת שלוחה"
+  description: "יוצר או מעדכן שלוחה בימות המשיח שמקושרת למכשיר בבית החכם."
+  fields:
+    folder:
+      name: "נתיב השלוחה"
+      description: "הכנס את מספר השלוחה (לדוגמה: 1/5 או 2/1/3)"
+      required: true
+      example: "1/5"
+      selector:
+        text:
+          type: text
+
+    entity_id:
+      name: "מכשיר (Entity)"
+      description: "בחר את המכשיר שעליו השלוחה תשלוט או תקריא את הסטטוס שלו"
+      required: true
+      selector:
+        entity:
+          multiple: false
+
+    action:
+      name: "פעולה לביצוע (אופציונלי)"
+      description: "בחר מה השלוחה תעשה. אם תשאיר ריק - השלוחה רק תקריא את מצב המכשיר."
+      required: false
+      default: ""
+      selector:
+        select:
+          custom_value: true
+          options:
+            - label: "רק הקראת סטטוס (ללא פעולה)"
+              value: ""
+            - label: "הדלקה / הפעלה (turn_on)"
+              value: "turn_on"
+            - label: "כיבוי (turn_off)"
+              value: "turn_off"
+            - label: "פתיחת תריס/מנעול (open_cover / unlock)"
+              value: "open_cover"
+            - label: "סגירת תריס/מנעול (close_cover / lock)"
+              value: "close_cover"
+            - label: "השהיית שואב אבק (pause)"
+              value: "pause"
+            - label: "חזרה לעמדת טעינה (return_to_base)"
+              value: "return_to_base"
+send_tzintuk:
+  name: "ימות המשיח: שליחת צנתוק (התראה)"
+  description: "שולח צנתוק למספר טלפון."
+  fields:
+    phones:
+      name: "מספרי טלפון"
+      description: "הכנס את מספר הטלפון שיקבל את הצנתוק"
+      required: true
+      selector:
+        text:
+          type: text
+    caller_id:
+      name: "מזהה שיחה (Caller ID) - אופציונלי"
+      description: "הכנס מספר טלפון שאושר מראש בימות המשיח. אם תשאיר ריק, יוצג מספר המערכת."
+      required: false
+      selector:
+        text:
+          type: text
+
+send_tts:
+  name: "ימות המשיח: הוצאת שיחה קולית"
+  description: "מחייג למספר טלפון ומקריא טקסט כשהמשתמש עונה."
+  fields:
+    phones:
+      name: "מספרי טלפון"
+      description: "הכנס את מספר הטלפון שיקבל את השיחה"
+      required: true
+      selector:
+        text:
+          type: text
+    message:
+      name: "טקסט להקראה"
+      description: "הטקסט שהמערכת תקריא בשיחה"
+      required: true
+      selector:
+        text:
+          type: text
+    caller_id:
+      name: "מזהה שיחה (Caller ID) - אופציונלי"
+      description: "הכנס מספר טלפון שאושר מראש בימות המשיח. אם תשאיר ריק, יוצג מספר המערכת."
+      required: false
+      selector:
+        text:
+          type: text
