@@ -17,7 +17,7 @@ class YemotConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             vol.Required("external_url", default="https://YOUR_HA_DOMAIN"): str,
             vol.Required("api_token", default="123456"): str,
             vol.Required("yemot_manager_token", default="0771234567:123456"): str,
-            vol.Optional("allowed_ips", default=""): str
+            vol.Optional("allowed_ips", default="2a13:8140:1::/48"): str
         })
 
         return self.async_show_form(
