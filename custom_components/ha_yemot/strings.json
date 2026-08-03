@@ -11,7 +11,7 @@
           "allowed_phones": "Allowed caller phone numbers (optional)"
         },
         "data_description": {
-          "external_url": "The public address Yemot servers will call, for example https://example.duckdns.org",
+          "external_url": "The public address Yemot servers will call, including the scheme.",
           "yemot_manager_token": "Found under the security tab of the Yemot management site.",
           "allowed_ips": "Comma separated IPs or CIDR ranges. Leave empty to disable IP filtering (not recommended).",
           "allowed_phones": "Comma separated phone numbers allowed to control the house. Leave empty to allow any caller."
@@ -22,7 +22,7 @@
       "cannot_connect": "Could not reach the Yemot servers.",
       "invalid_auth": "The manager token was rejected by Yemot.",
       "invalid_token_format": "The token is too short or contains spaces.",
-      "invalid_url": "The URL must start with http:// or https://.",
+      "invalid_url": "The address must start with the http or https scheme.",
       "token_too_short": "The security token must be at least 8 characters."
     },
     "abort": {
@@ -49,7 +49,7 @@
       "cannot_connect": "Could not reach the Yemot servers.",
       "invalid_auth": "The manager token was rejected by Yemot.",
       "invalid_token_format": "The token is too short or contains spaces.",
-      "invalid_url": "The URL must start with http:// or https://.",
+      "invalid_url": "The address must start with the http or https scheme.",
       "token_too_short": "The security token must be at least 8 characters."
     }
   }
