@@ -1,0 +1,56 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Yemot HaMashiach",
+        "description": "Connect Home Assistant to your Yemot HaMashiach telephony system.",
+        "data": {
+          "external_url": "External Home Assistant URL",
+          "yemot_manager_token": "Yemot manager token (number:password)",
+          "allowed_ips": "Allowed IP ranges",
+          "allowed_phones": "Allowed caller phone numbers (optional)"
+        },
+        "data_description": {
+          "external_url": "The public address Yemot servers will call, for example https://example.duckdns.org",
+          "yemot_manager_token": "Found under the security tab of the Yemot management site.",
+          "allowed_ips": "Comma separated IPs or CIDR ranges. Leave empty to disable IP filtering (not recommended).",
+          "allowed_phones": "Comma separated phone numbers allowed to control the house. Leave empty to allow any caller."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the Yemot servers.",
+      "invalid_auth": "The manager token was rejected by Yemot.",
+      "invalid_token_format": "The token is too short or contains spaces.",
+      "invalid_url": "The URL must start with http:// or https://.",
+      "token_too_short": "The security token must be at least 8 characters."
+    },
+    "abort": {
+      "already_configured": "Yemot HaMashiach is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Yemot HaMashiach settings",
+        "data": {
+          "external_url": "External Home Assistant URL",
+          "yemot_manager_token": "Yemot manager token (number:password)",
+          "allowed_ips": "Allowed IP ranges",
+          "allowed_phones": "Allowed caller phone numbers (optional)",
+          "api_token": "Security token used in extension links"
+        },
+        "data_description": {
+          "api_token": "Random string generated at install time. Changing it invalidates every existing extension."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the Yemot servers.",
+      "invalid_auth": "The manager token was rejected by Yemot.",
+      "invalid_token_format": "The token is too short or contains spaces.",
+      "invalid_url": "The URL must start with http:// or https://.",
+      "token_too_short": "The security token must be at least 8 characters."
+    }
+  }
+}

@@ -4,16 +4,15 @@ create_extension:
   fields:
     folder:
       name: "נתיב השלוחה"
-      description: "הכנס את מספר השלוחה (לדוגמה: 1/5 או 2/1/3)"
+      description: "מספר השלוחה בלבד, מופרד בלוכסנים. לדוגמה: 1/5"
       required: true
       example: "1/5"
       selector:
         text:
-          type: text
 
     entity_id:
       name: "מכשיר (Entity)"
-      description: "בחר את המכשיר שעליו השלוחה תשלוט או תקריא את הסטטוס שלו"
+      description: "המכשיר שעליו השלוחה תשלוט או תקריא את מצבו."
       required: true
       selector:
         entity:
@@ -21,68 +20,111 @@ create_extension:
 
     action:
       name: "פעולה לביצוע (אופציונלי)"
-      description: "בחר מה השלוחה תעשה. אם תשאיר ריק - השלוחה רק תקריא את מצב המכשיר."
+      description: >-
+        מה השלוחה תעשה. אם תשאיר ריק, השלוחה רק תקריא את מצב המכשיר.
+        ודא שהפעולה נתמכת בסוג המכשיר שבחרת.
       required: false
       default: ""
       selector:
         select:
-          custom_value: true
+          custom_value: false
           options:
             - label: "רק הקראת סטטוס (ללא פעולה)"
               value: ""
-            - label: "הדלקה / הפעלה (turn_on)"
+            - label: "הדלקה / הפעלה"
               value: "turn_on"
-            - label: "כיבוי (turn_off)"
+            - label: "כיבוי"
               value: "turn_off"
-            - label: "פתיחת תריס/מנעול (open_cover / unlock)"
+            - label: "החלפת מצב"
+              value: "toggle"
+            - label: "פתיחת תריס"
               value: "open_cover"
-            - label: "סגירת תריס/מנעול (close_cover / lock)"
+            - label: "סגירת תריס"
               value: "close_cover"
-            - label: "השהיית שואב אבק (pause)"
+            - label: "עצירת תריס"
+              value: "stop_cover"
+            - label: "נעילת מנעול"
+              value: "lock"
+            - label: "פתיחת מנעול"
+              value: "unlock"
+            - label: "הפעלת שואב אבק"
+              value: "start"
+            - label: "השהיית שואב אבק"
               value: "pause"
-            - label: "חזרה לעמדת טעינה (return_to_base)"
+            - label: "חזרה לעמדת טעינה"
               value: "return_to_base"
+            - label: "לחיצת כפתור"
+              value: "press"
+            - label: "הפעלת אוטומציה"
+              value: "trigger"
+
 send_tzintuk:
   name: "ימות המשיח: שליחת צנתוק (התראה)"
-  description: "שולח צנתוק למספר טלפון."
+  description: "שולח צנתוק למספר טלפון או לרשימת תפוצה."
   fields:
     phones:
       name: "מספרי טלפון"
-      description: "הכנס את מספר הטלפון שיקבל את הצנתוק"
+      description: "מספר יחיד, מספרים מופרדים בפסיקים, או רשימת תפוצה בפורמט tzl:1"
       required: true
+      example: "0501234567,0527654321"
       selector:
         text:
-          type: text
+
     caller_id:
-      name: "מזהה שיחה (Caller ID) - אופציונלי"
-      description: "הכנס מספר טלפון שאושר מראש בימות המשיח. אם תשאיר ריק, יוצג מספר המערכת."
+      name: "מזהה שיחה (אופציונלי)"
+      description: "מספר טלפון שאושר מראש בימות המשיח. אם ריק, יוצג מספר המערכת."
       required: false
       selector:
         text:
-          type: text
 
 send_tts:
   name: "ימות המשיח: הוצאת שיחה קולית"
-  description: "מחייג למספר טלפון ומקריא טקסט כשהמשתמש עונה."
+  description: "מחייג למספר טלפון ומקריא טקסט כשעונים."
   fields:
     phones:
       name: "מספרי טלפון"
-      description: "הכנס את מספר הטלפון שיקבל את השיחה"
+      description: "מספר יחיד או מספרים מופרדים בפסיקים."
       required: true
+      example: "0501234567"
       selector:
         text:
-          type: text
+
     message:
       name: "טקסט להקראה"
-      description: "הטקסט שהמערכת תקריא בשיחה"
+      description: "הטקסט שהמערכת תקריא בשיחה."
       required: true
+      example: "דלת הכניסה נפתחה"
       selector:
         text:
-          type: text
+          multiline: true
+
     caller_id:
-      name: "מזהה שיחה (Caller ID) - אופציונלי"
-      description: "הכנס מספר טלפון שאושר מראש בימות המשיח. אם תשאיר ריק, יוצג מספר המערכת."
+      name: "מזהה שיחה (אופציונלי)"
+      description: "מספר טלפון שאושר מראש בימות המשיח. אם ריק, יוצג מספר המערכת."
       required: false
       selector:
         text:
-          type: text
+
+    tts_voice:
+      name: "קול ההקראה (אופציונלי)"
+      description: "בחירת הקול שיקריא את ההודעה."
+      required: false
+      selector:
+        select:
+          options:
+            - label: "קול נשי (ymFemale)"
+              value: "ymFemale"
+            - label: "קול גברי (ymMale)"
+              value: "ymMale"
+
+    tts_rate:
+      name: "מהירות הדיבור (אופציונלי)"
+      description: "ערך שלילי מאט את ההקראה, ערך חיובי מאיץ אותה."
+      required: false
+      example: -10
+      selector:
+        number:
+          min: -50
+          max: 50
+          step: 5
+          mode: slider

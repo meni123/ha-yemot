@@ -2,8 +2,12 @@
   "domain": "ha_yemot",
   "name": "Yemot HaMashiach API",
   "codeowners": ["@meni123"],
-  "dependencies": [],
-  "requirements": [],
   "config_flow": true,
-  "version": "1.0.0"
+  "dependencies": ["http"],
+  "documentation": "https://github.com/meni123/ha-yemot",
+  "integration_type": "service",
+  "iot_class": "cloud_push",
+  "issue_tracker": "https://github.com/meni123/ha-yemot/issues",
+  "requirements": [],
+  "version": "1.1.2"
 }
