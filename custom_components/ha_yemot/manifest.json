@@ -9,5 +9,5 @@
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/meni123/ha-yemot/issues",
   "requirements": [],
-  "version": "1.1.2"
+  "version": "1.1.3"
 }
