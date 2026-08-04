@@ -11,6 +11,7 @@ from aiohttp import web
 
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.util import dt as dt_util
 
@@ -18,6 +19,8 @@ from .const import (
     ALLOWED_ACTIONS,
     ALLOWED_DOMAINS,
     DOMAIN,
+    EVENT_CALL_RECEIVED,
+    SIGNAL_CALL_RECEIVED,
     MAX_RESPONSE_LENGTH,
     STATE_CHANGE_TIMEOUT,
 )
@@ -123,30 +126,40 @@ class YemotApiView(HomeAssistantView):
                 _LOGGER.warning("נחסמה שיחה ממספר לא מורשה: %s", caller)
                 return self._build_response("המספר שלך אינו מורשה לגשת למערכת")
 
-        # --- שלב 4: בדיקת תקינות הישות ---
+        # --- שלב 4: בדיקת תקינות מזהה הישות ---
         if "." not in entity_id:
             return self._build_response("מזהה מכשיר שגוי")
 
         entity_domain = entity_id.split(".", 1)[0]
+
+        # --- שלב 5: רשימת ההיתר, לפני כל דבר אחר ---
+        # הבדיקה מקדימה בכוונה את בדיקת קיום המכשיר. כך פעולה שאינה
+        # מורשית נחסמת תמיד, ולא רק כאשר המכשיר במקרה קיים, והתשובה
+        # גם אינה מסגירה אילו מכשירים מוגדרים במערכת.
+        if action:
+            if entity_domain not in ALLOWED_DOMAINS or action not in ALLOWED_ACTIONS:
+                _LOGGER.warning(
+                    "נחסם ניסיון להפעיל פעולה לא מורשית: %s.%s", entity_domain, action
+                )
+                return self._build_response("הפעולה המבוקשת אינה מורשית")
+
+            if not self.hass.services.has_service(entity_domain, action):
+                return self._build_response("הפעולה אינה נתמכת עבור מכשיר זה")
+
+        # --- שלב 6: איתור המכשיר ---
         state = self.hass.states.get(entity_id)
         if state is None:
             return self._build_response("המכשיר לא נמצא")
 
-        # --- שלב 5: הקראת סטטוס בלבד ---
+        # דיווח על השיחה לחיישנים ולמנוע האוטומציות. מתבצע רק לאחר
+        # שהבקשה נמצאה תקינה במלואה, כך שניסיונות חסומים אינם נספרים.
+        self._report_call(request.query.get("ext", ""), entity_id, action or "")
+
+        # --- שלב 7: הקראת סטטוס בלבד ---
         if not action:
             return self._build_response(
                 f"הסטטוס כרגע {self._translate_state(entity_domain, state)}"
             )
-
-        # --- שלב 6: ביצוע פעולה, לאחר בדיקת רשימות ההיתר ---
-        if entity_domain not in ALLOWED_DOMAINS or action not in ALLOWED_ACTIONS:
-            _LOGGER.warning(
-                "נחסם ניסיון להפעיל פעולה לא מורשית: %s.%s", entity_domain, action
-            )
-            return self._build_response("הפעולה המבוקשת אינה מורשית")
-
-        if not self.hass.services.has_service(entity_domain, action):
-            return self._build_response("הפעולה אינה נתמכת עבור מכשיר זה")
 
         try:
             new_state = await self._call_and_wait(entity_domain, action, entity_id)
@@ -187,6 +200,16 @@ class YemotApiView(HomeAssistantView):
             await process_wrong_login(request)
         except Exception:  # noqa: BLE001 - המנגנון אופציונלי ולא קריטי
             _LOGGER.debug("לא ניתן לדווח למנגנון חסימת ה-IP", exc_info=True)
+
+    def _report_call(self, folder: str, entity_id: str, action: str) -> None:
+        """הודעה לחיישנים ולמנוע האוטומציות על שיחה נכנסת."""
+        async_dispatcher_send(
+            self.hass, SIGNAL_CALL_RECEIVED, folder, entity_id, action
+        )
+        self.hass.bus.async_fire(
+            EVENT_CALL_RECEIVED,
+            {"folder": folder, "entity_id": entity_id, "action": action},
+        )
 
     @staticmethod
     async def _get_caller_phone(request: web.Request) -> str:

@@ -19,6 +19,38 @@ RUN_TZINTUK_URL: Final = f"{YEMOT_API_BASE_URL}/RunTzintuk"
 SEND_TTS_URL: Final = f"{YEMOT_API_BASE_URL}/SendTTS"
 GET_CUSTOMER_DATA_URL: Final = f"{YEMOT_API_BASE_URL}/GetCustomerData"
 
+# --- קריאות API נוספות, לסריקה ולבדיקת סנכרון ---
+GET_IVR2_DIR_URL: Final = f"{YEMOT_API_BASE_URL}/GetIVR2Dir"
+GET_TEXT_FILE_URL: Final = f"{YEMOT_API_BASE_URL}/GetTextFile"
+
+# --- תת-רשומות ---
+SUBENTRY_TYPE_EXTENSION: Final = "extension"
+CONF_FOLDER: Final = "folder"
+CONF_TARGET_ENTITY: Final = "entity_id"
+CONF_ACTION: Final = "action"
+
+# החתימה שמסמנת שלוחה כמנוהלת על ידי התוסף.
+# בלעדיה אי אפשר להבחין בין שלוחה שלנו לבין תפריט של המשתמש,
+# ולכן היא תנאי מקדים לזיהוי, לסריקה ולבדיקת הסנכרון.
+MANAGED_SIGNATURE: Final = "# managed-by-ha-yemot"
+
+# --- תזמונים ---
+# בדיקת סנכרון מול ימות. אין לקצר את זה משמעותית:
+# כל בדיקה עולה קריאת API אחת לכל שלוחה מנוהלת.
+SYNC_SCAN_INTERVAL_MINUTES: Final = 30
+# תוקף המטמון של סריקת השלוחות עבור הבורר בטופס.
+# קצר בכוונה, כדי ששינוי או מחיקה ישתקפו בבורר כמעט מיד.
+PICKER_CACHE_SECONDS: Final = 45
+# עומק הסריקה עבור הבורר. שלוש רמות מכסות מבנים כמו 1/2/3.
+# כל רמה נוספת מכפילה בערך את מספר קריאות ה-API בפתיחת הטופס,
+# ולכן התוצאה נשמרת במטמון לפי PICKER_CACHE_SECONDS.
+PICKER_SCAN_DEPTH: Final = 3
+
+# --- אותות פנימיים ---
+SIGNAL_CALL_RECEIVED: Final = f"{DOMAIN}_call_received"
+EVENT_CALL_RECEIVED: Final = f"{DOMAIN}_call_received"
+
+
 # טווח ה-IP של שרתי ימות המשיח (נכון למועד הכתיבה).
 # אם ימות משנים טווחים - זה המקום היחיד לעדכן.
 DEFAULT_ALLOWED_IPS: Final = "2a13:8140:1::/48"

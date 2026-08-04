@@ -53,5 +53,65 @@
       "invalid_url": "הכתובת חייבת להתחיל בתחילית http או https.",
       "token_too_short": "טוקן האבטחה חייב להכיל לפחות 8 תווים."
     }
+  },
+  "entity": {
+    "sensor": {
+      "last_call": {
+        "name": "שיחה אחרונה"
+      },
+      "call_count": {
+        "name": "מונה שיחות"
+      }
+    },
+    "binary_sensor": {
+      "sync_problem": {
+        "name": "חריגה בהגדרה"
+      }
+    },
+    "button": {
+      "test": {
+        "name": "בדיקת פעולה"
+      },
+      "rewrite": {
+        "name": "כתיבה מחדש"
+      }
+    }
+  },
+  "config_subentries": {
+    "extension": {
+      "initiate_flow": {
+        "user": "הוסף שלוחה",
+        "reconfigure": "ערוך שלוחה"
+      },
+      "entry_type": "שלוחה",
+      "step": {
+        "user": {
+          "title": "הוספת שלוחה",
+          "data": {
+            "folder": "נתיב השלוחה",
+            "entity_id": "המכשיר",
+            "action": "הפעולה"
+          },
+          "data_description": {
+            "folder": "בחר שלוחה פנויה מהרשימה, או הקלד נתיב ידנית.",
+            "action": "השאר על הקראת סטטוס כדי שהשלוחה רק תקריא את מצב המכשיר."
+          }
+        },
+        "reconfigure": {
+          "title": "עריכת שלוחה",
+          "data": {
+            "folder": "נתיב השלוחה",
+            "entity_id": "המכשיר",
+            "action": "הפעולה"
+          }
+        }
+      },
+      "error": {
+        "invalid_folder": "נתיב לא תקין. יש להשתמש בספרות מופרדות בלוכסן, למשל 1/5.",
+        "folder_in_use": "השלוחה הזו כבר מנוהלת על ידי התוסף.",
+        "write_failed": "הכתיבה לימות נכשלה. יש לבדוק את היומן לפרטים.",
+        "folder_occupied": "השלוחה תפוסה על ידי תפריט או תוכן קיים בימות. יש לבחור שלוחה אחרת."
+      }
+    }
   }
 }

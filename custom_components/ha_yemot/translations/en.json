@@ -53,5 +53,65 @@
       "invalid_url": "The address must start with the http or https scheme.",
       "token_too_short": "The security token must be at least 8 characters."
     }
+  },
+  "entity": {
+    "sensor": {
+      "last_call": {
+        "name": "Last call"
+      },
+      "call_count": {
+        "name": "Call count"
+      }
+    },
+    "binary_sensor": {
+      "sync_problem": {
+        "name": "Configuration mismatch"
+      }
+    },
+    "button": {
+      "test": {
+        "name": "Test action"
+      },
+      "rewrite": {
+        "name": "Rewrite extension"
+      }
+    }
+  },
+  "config_subentries": {
+    "extension": {
+      "initiate_flow": {
+        "user": "Add extension",
+        "reconfigure": "Edit extension"
+      },
+      "entry_type": "Extension",
+      "step": {
+        "user": {
+          "title": "Add extension",
+          "data": {
+            "folder": "Extension path",
+            "entity_id": "Device",
+            "action": "Action"
+          },
+          "data_description": {
+            "folder": "Choose a free path, or type one manually.",
+            "action": "Leave on status only to just announce the device state."
+          }
+        },
+        "reconfigure": {
+          "title": "Edit extension",
+          "data": {
+            "folder": "Extension path",
+            "entity_id": "Device",
+            "action": "Action"
+          }
+        }
+      },
+      "error": {
+        "invalid_folder": "Invalid path. Use digits separated by slashes, for example 1/5.",
+        "folder_in_use": "This extension is already managed by the integration.",
+        "write_failed": "Writing to Yemot failed. Check the log for details.",
+        "folder_occupied": "This extension already holds a menu or other content in Yemot. Choose a different one."
+      }
+    }
   }
 }
